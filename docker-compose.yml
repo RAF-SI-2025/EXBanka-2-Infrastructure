@@ -100,6 +100,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}
       RABBITMQ_URL: ${RABBITMQ_URL}
+      BANK_SERVICE_ADDR: "http://bank-service:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -107,6 +108,8 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
+      bank-service:
+        condition: service_started
     networks:
       - bank-net
   bank-service:
@@ -135,9 +138,11 @@ services:
       REDIS_URL: "redis://redis:6379"
       NOTIFICATION_SERVICE_ADDR: "notification-service:50053"
       # --- TRŽIŠNI PODACI (hartije od vrednosti) ---
+      EODHD_API_KEY: ${EODHD_API_KEY:-}
       FINNHUB_API_KEY: ${FINNHUB_API_KEY:-}
       ALPHAVANTAGE_API_KEY: ${ALPHAVANTAGE_API_KEY:-}
       LISTING_REFRESH_INTERVAL_MINUTES: ${LISTING_REFRESH_INTERVAL_MINUTES:-15}
+      LISTING_REQUIRE_LIVE_QUOTES: ${LISTING_REQUIRE_LIVE_QUOTES:-false}
     depends_on:
       db:
         condition: service_healthy
